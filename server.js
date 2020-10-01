@@ -8,10 +8,6 @@ server.use(express.json())
 
 // POST (CREATE in Crud acronym)
 server.post("/users", (req, res) => {
-    const newUser = db.createUser({
-        name: req.body.name,
-        bio: req.body.bio,
-    })
     // If the request body is missing the "name" or "bio" property:
     if (!req.body.name || !req.body.bio) {
         // respond with HTTP status 400 (Bad Request)
@@ -19,6 +15,12 @@ server.post("/users", (req, res) => {
             errorMessage: "Please provide name and bio for the user."
         }) // and return the preceding JSON object.
     }
+
+    const newUser = db.createUser({
+        name: req.body.name,
+        bio: req.body.bio,
+    })
+
     // If the info about the user is valid:
     if (newUser) {
         // respond with HTTP status code 201 (Created), 
@@ -78,9 +80,6 @@ server.get("/users/:id", (req, res) => {
 
 // PUT (UPDATE in crUd acronym)
 server.put("/users/:id", (req, res) => {
-    const id = req.params.id
-    const user = db.getUserById(id)
-
     // If the request body is missing the "name" or "bio" property:
     if (!req.body.name || !req.body.bio) {
         // respond with HTTP status 400 (Bad Request)
@@ -88,6 +87,9 @@ server.put("/users/:id", (req, res) => {
             errorMessage: "Please provide name and bio for the user."
         }) // and return the preceding JSON object.
     }
+
+    const id = req.params.id
+    const user = db.getUserById(id)
 
     // If the user is found and the new info is valid:
     if (user) {
