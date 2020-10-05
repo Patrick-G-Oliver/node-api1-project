@@ -4,6 +4,8 @@ let users = [
 	{ id: "3", name: "Jack Doe", bio: "aka J.D." },
 ]
 
+/*let users = []*/
+
 function getUsers() {
 	return users
 }
