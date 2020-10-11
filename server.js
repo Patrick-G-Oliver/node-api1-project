@@ -2,9 +2,18 @@ const express = require("express")
 const db = require("./database")
 
 const server = express()
+const port = process.env.PORT || 8080
 
 // this allows us to parse request JSON bodies
 server.use(express.json())
+
+// Wecome message:
+server.get("/", (req, res) => {
+    res.status(200).json({
+        message: `Welcome ${process.env.COHORT}`,
+        fact: process.env.FUN_FACT || "I have no fun facts."
+    })
+})
 
 // POST (CREATE in Crud acronym)
 server.post("/users", (req, res) => {
@@ -12,15 +21,15 @@ server.post("/users", (req, res) => {
     // Optionally, the body object may be destructured as follows:
     // const { name, bio } = req.body
     // This would allow for <if (name && bio) { . . . }> (see line 18)
-    // See the .put handler below for an example.
+    // See the .put handler below for an example of this.
 
-    // If both the name and bio are included, create a newUser.
+    // If both the name and bio are included in the request, create a newUser.
     if (req.body.name && req.body.bio) {
         const newUser = db.createUser({
             name: req.body.name,
             bio: req.body.bio,
         })
-        // Return a 200 (OK) and the newUser.
+        // Return a 201 (Created) and the newUser.
         return res.status(201).json(newUser)
     // Else, if the name OR bio are absent, return a 400 (Bad Request) and errorMessage.
     } else if (!req.body.name || !req.body.bio) {
@@ -111,29 +120,50 @@ server.put("/users/:id", (req, res) => {
 
 // DELETE (DESTROY in cruD acronym)
 server.delete("/users/:id", (req, res) => {
-
+    db.deleteUser(req.params.id)
+        .then((user) => {
+            if (user) {
+                return res.status(200).json({
+                    message: "Adios, user!"
+                })
+            } else {
+                res.status(404).json({
+                    message: "The user with the specified ID does not exist."
+                })
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            res.status(500).json({
+            error: "The user could not be removed."
+        })
+    })
+    /*
     const id = req.params.id
     const user = db.getUserById(id)
 
     // If the user if found by id, return a 204 (No Content).
     if (user) {
         db.deleteUser(id)
-        return res.status(204).end()
+        return res.status(200).json({
+            message: "Adios, user!"
+        })
         // Or, <res.status(204).end()>
     // Else, if the user is not found by id, 
     // return a 400 (Not Found) and a message.
     } else if (!user) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "The user with the specified ID does not exist."
         })
     // // Else, return a 500 (Server Error) and a message.
     } else {
-        res.status(500).json({
+        return res.status(500).json({
             errorMessage: "The user could not be removed."
         })
     }
+    */
 })
 
-server.listen(8080, () => {
-    console.log("The server is listening.")
+server.listen(port, () => {
+    console.log(`The server is listening on ${port}.`)
 })
