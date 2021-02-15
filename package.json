@@ -1,0 +1,13 @@
+{
+    "scripts": {
+        "watch": "nodemon --require dotenv/config server.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.2",
+        "dotenv": "^8.2.0",
+        "nodemon": "^2.0.4"
+    }
+}
